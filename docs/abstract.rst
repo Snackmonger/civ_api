@@ -7,10 +7,8 @@ How does the game work?
 
 Turn-based-gameplay.
     - Get information about a city, unit, etc. (API GET)
-    - Issue orders to individual units on a turn (API POST)
-        Server calculates effects of orders and returns a response.
-    - Issue 'end turn' notice (API POST).
-        Server calculates enemy moves and random events and returns a response.
+    - Issue orders to individual units on a turn (API POST) -> Server calculates effects of orders and returns a response.
+    - Issue 'end turn' notice (API POST) -> Server calculates enemy moves and random events and returns a response.
     - The response contains details about enemy movements if they occurr within n tiles of a unit belonging to user.
 
 Territorial acquisition.
