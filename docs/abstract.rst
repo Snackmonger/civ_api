@@ -142,9 +142,10 @@ Whenever the API call is over, you either sent a POST/PUT request to be written 
 of those parties in the database), or you sent a GET request to read the current state, and no change to the database happened. None of the objects are needed after the write operation
 takes place, and if there is no write operation, then no objects are needed and we can simply pull data from the database.
 
-The time between POST requests might be a long time, and the game cannot keep objects in memory for no reason. 
+The time between POST requests might be a long time, and the game cannot keep objects in memory for no reason. This is a stateful game!
 
 Therefore, the API-based app is responsible for 
+
 1. initializing the main game controller with the current game state whenever a POST request is received 
 2. asking the main game controller to perform an operation on some state contained in its components
 3. writing the result of the operation into the database
