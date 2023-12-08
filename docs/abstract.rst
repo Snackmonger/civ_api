@@ -146,10 +146,10 @@ The time between POST requests might be a long time, and the game cannot keep ob
 
 Therefore, the API-based app is responsible for 
 
-1. initializing the main game controller with the current game state whenever a POST request is received 
-2. asking the main game controller to perform an operation on some state contained in its components
-3. writing the result of the operation into the database
-4. returning an appropriate response with the results of the operation
+    1. initializing the main game controller with the current game state whenever a POST request is received 
+    2. asking the main game controller to perform an operation on some state contained in its components
+    3. writing the result of the operation into the database
+    4. returning an appropriate response with the results of the operation
 
 So what happens to the game object after this? Does it just go out of scope and get garbage collected? I suppose so, since the next call is presumably responsible
 for initializing a new controller as described above, and the old one is not needed. 
