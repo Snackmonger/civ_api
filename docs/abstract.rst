@@ -85,13 +85,13 @@ A 'thinking out loud' approach to refining some of the core concepts in a realis
 
 ::
 
-total resources = {}
-for tile in city's tiles:
-    for resource in tile's resources:
-        if resource in total resources:
-            total resources [resource] += tile's resources [resource]
-        else:
-            total resources [resource] = tile's resources [resource]
+    total resources = {}
+    for tile in city's tiles:
+        for resource in tile's resources:
+            if resource in total resources:
+                total resources [resource] += tile's resources [resource]
+            else:
+                total resources [resource] = tile's resources [resource]
 
 
 So... does the tile keep a dictionary of resources? are the resources dataclasses? is the tile an object or just a reference to the database? 
@@ -100,32 +100,32 @@ Maybe more like this:
 
 ::
 
-total resources = {}
-city tiles : list[dict[str, immutable type]] = self.get(TILES)
-for tile in city tiles:
-    t = Tile(*tile)
-    for resource in t.resources:
-        if resource in total resources:
-            total resources [resource] += tile's resources [resource]
-        else:
-            total resources [resource] = tile's resources [resource]
+    total resources = {}
+    city tiles : list[dict[str, immutable type]] = self.get(TILES)
+    for tile in city tiles:
+        t = Tile(*tile)
+        for resource in t.resources:
+            if resource in total resources:
+                total resources [resource] += tile's resources [resource]
+            else:
+                total resources [resource] = tile's resources [resource]
 
 Where self.get() is a method supplying tables from the database like this:
 
 ::
 
-class City:
-    init(self, ..., parameters, ...)
-    ...
-    self.callbacks: dict[str, callable] = {}
-
-    def ... business logic ...
-
-    def add callback(self, callback) -> none
-        if not callback in self.callbacks  -> add callback
-
-    def get(self, table_name) -> list[dict]
-        -> self.callbacks[GET](self, table_name)
+    class City:
+        init(self, ..., parameters, ...)
+        ...
+        self.callbacks: dict[str, callable] = {}
+    
+        def ... business logic ...
+    
+        def add callback(self, callback) -> none
+            if not callback in self.callbacks  -> add callback
+    
+        def get(self, table_name) -> list[dict]
+            -> self.callbacks[GET](self, table_name)
 
 
 Where the callback is supplied by a higher-level controller or delegate. Therefore, city does not need to know about the database implementation, it just forwards the relevant info.
