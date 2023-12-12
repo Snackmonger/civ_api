@@ -7,10 +7,8 @@ How does the game work?
 
 Turn-based-gameplay.
     - Get information about a city, unit, etc. (API GET)
-    - Issue orders to individual units on a turn (API POST)
-        - Server calculates effects of orders and returns a response.
-    - Issue 'end turn' notice (API POST).
-        - Server calculates enemy moves and random events and returns a response.
+    - Issue orders to individual units on a turn (API POST) -> Server calculates effects of orders and returns a response.
+    - Issue 'end turn' notice (API POST) -> Server calculates enemy moves and random events and returns a response.
     - The response contains details about enemy movements if they occurr within n tiles of a unit belonging to user.
 
 Territorial acquisition.
@@ -85,13 +83,13 @@ A 'thinking out loud' approach to refining some of the core concepts in a realis
 
 ::
 
-total resources = {}
-for tile in city's tiles:
-    for resource in tile's resources:
-        if resource in total resources:
-            total resources [resource] += tile's resources [resource]
-        else:
-            total resources [resource] = tile's resources [resource]
+    total resources = {}
+    for tile in city's tiles:
+        for resource in tile's resources:
+            if resource in total resources:
+                total resources [resource] += tile's resources [resource]
+            else:
+                total resources [resource] = tile's resources [resource]
 
 
 So... does the tile keep a dictionary of resources? are the resources dataclasses? is the tile an object or just a reference to the database? 
@@ -100,32 +98,32 @@ Maybe more like this:
 
 ::
 
-total resources = {}
-city tiles : list[dict[str, immutable type]] = self.get(TILES)
-for tile in city tiles:
-    t = Tile(*tile)
-    for resource in t.resources:
-        if resource in total resources:
-            total resources [resource] += tile's resources [resource]
-        else:
-            total resources [resource] = tile's resources [resource]
+    total resources = {}
+    city tiles : list[dict[str, immutable type]] = self.get(TILES)
+    for tile in city tiles:
+        t = Tile(*tile)
+        for resource in t.resources:
+            if resource in total resources:
+                total resources [resource] += tile's resources [resource]
+            else:
+                total resources [resource] = tile's resources [resource]
 
 Where self.get() is a method supplying tables from the database like this:
 
 ::
 
-class City:
-    init(self, ..., parameters, ...)
-    ...
-    self.callbacks: dict[str, callable] = {}
-
-    def ... business logic ...
-
-    def add callback(self, callback) -> none
-        if not callback in self.callbacks  -> add callback
-
-    def get(self, table_name) -> list[dict]
-        -> self.callbacks[GET](self, table_name)
+    class City:
+        init(self, ..., parameters, ...)
+        ...
+        self.callbacks: dict[str, callable] = {}
+    
+        def ... business logic ...
+    
+        def add callback(self, callback) -> none
+            if not callback in self.callbacks  -> add callback
+    
+        def get(self, table_name) -> list[dict]
+            -> self.callbacks[GET](self, table_name)
 
 
 Where the callback is supplied by a higher-level controller or delegate. Therefore, city does not need to know about the database implementation, it just forwards the relevant info.
@@ -142,13 +140,14 @@ Whenever the API call is over, you either sent a POST/PUT request to be written 
 of those parties in the database), or you sent a GET request to read the current state, and no change to the database happened. None of the objects are needed after the write operation
 takes place, and if there is no write operation, then no objects are needed and we can simply pull data from the database.
 
-The time between POST requests might be a long time, and the game cannot keep objects in memory for no reason. 
+The time between POST requests might be a long time, and the game cannot keep objects in memory for no reason. This is a stateful game!
 
 Therefore, the API-based app is responsible for 
-1. initializing the main game controller with the current game state whenever a POST request is received 
-2. asking the main game controller to perform an operation on some state contained in its components
-3. writing the result of the operation into the database
-4. returning an appropriate response with the results of the operation
+
+    1. initializing the main game controller with the current game state whenever a POST request is received 
+    2. asking the main game controller to perform an operation on some state contained in its components
+    3. writing the result of the operation into the database
+    4. returning an appropriate response with the results of the operation
 
 So what happens to the game object after this? Does it just go out of scope and get garbage collected? I suppose so, since the next call is presumably responsible
 for initializing a new controller as described above, and the old one is not needed. 
