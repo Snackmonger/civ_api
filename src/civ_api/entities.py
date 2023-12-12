@@ -91,6 +91,7 @@ class City(Entity):
                  ) -> None:
         super().__init__(abstract_uuid, instance_uuid, x, y)
         self.empire_uuid = empire_uuid
+        self.city_uuid: str
         self.name: str
         self.population: int
         self.level: int
@@ -100,9 +101,9 @@ class City(Entity):
         self.tiles: list[str] = []
         self.upgrades: Optional[list[str]] = []
 
-        self.declare_protocol(DoesJoinBattle)
-        self.declare_protocol(DoesOccupyCoordinates)
 
+    def end_turn(self) -> None:
+        ...
 
     @property
     def culture_per_turn(self) -> int:

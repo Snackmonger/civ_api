@@ -1,10 +1,4 @@
-
 from enum import StrEnum, auto
-
-
-def vals(enum: type[StrEnum]) -> list[str]:
-    return [e.value for e in enum]
-
 
 
 class UnitMoveTypes(StrEnum):
@@ -95,6 +89,7 @@ class Resources(StrEnum):
     SPICES = auto()
     DYES = auto()
     INCENSE = auto()
+
 
 class DatabaseTables(StrEnum):
     USER_UUIDS = auto()

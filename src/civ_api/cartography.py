@@ -21,6 +21,7 @@ class Tile():
             uuid: str,
             x: int,
             y: int,
+            resources: dict[str, int],
             resource_multiplier: int = 2,
             movement_multiplier: int = 2,
             occupier_uuid: Optional[str] = None,
@@ -31,6 +32,7 @@ class Tile():
         self.uuid: str = uuid
         self.x: int = x
         self.y: int = y
+        self.resources: dict[str, int] = resources
         self.resource_multiplier: int = resource_multiplier
         self.movement_multiplier: int = movement_multiplier
         self.occupier_uuid: Optional[str] = occupier_uuid
