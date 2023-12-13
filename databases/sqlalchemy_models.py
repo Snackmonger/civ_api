@@ -48,7 +48,6 @@ class User(Base):
     tiles: Mapped[list["Tile"]] = relationship(back_populates='parent')
 
 
-
 class Tile(Base):
     __tablename__ = "tile"
 
@@ -58,10 +57,13 @@ class Tile(Base):
     x: Mapped[int]
     y: Mapped[int]
     parent: Mapped["User"] = relationship(back_populates='tiles')
-    resources: Mapped["Resource"] = relationship(back_populates="tile")
+    resource: Mapped["Resource"] = relationship(back_populates="tile")
+    # owner: Mapped[Optional["Empire"]] = relationship(back_populates='tiles')
 
     def __repr__(self) -> str:
         return f'Tile {self.tile_uuid} @ ({self.x}, {self.y})'
+
+
 
 
 
@@ -70,7 +72,7 @@ class Resource(Base):
 
     tile_uuid:  Mapped[str] = mapped_column(ForeignKey("tile.tile_uuid"),
                                             primary_key=True)
-    tile: Mapped["Tile"] = relationship(back_populates='resources')
+    tile: Mapped["Tile"] = relationship(back_populates='resource')
 
     wheat:      Mapped[Optional[int]]
     water:      Mapped[Optional[int]]
@@ -117,7 +119,7 @@ class Resource(Base):
         '''
         skip = ['_sa_instance_state', 'tile_uuid']
         r: dict[str, int] = {}
-        for k, v in vars(self):
+        for k, v in vars(self).items():
             if not k in skip and v:
                 assert isinstance(v, int)
                 r.update({k:v})

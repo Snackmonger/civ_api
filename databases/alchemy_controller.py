@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import Engine, select
+from sqlalchemy import Engine, select, create_engine
 from sqlalchemy.orm import Session
 
 from src.civ_api.type_aliasing import IntPair
@@ -15,9 +15,10 @@ resource_generator = test_get_random_resources
 
 class Alchemist:
 
-    def __init__(self, engine: Engine) -> None:
-        self.engine = engine
-        self.session = Session(engine)
+    def __init__(self, db_address: str) -> None:
+
+        self.engine = create_engine(db_address)
+        self.session = Session(self.engine)
 
 
     def new_user(self, 
@@ -32,7 +33,7 @@ class Alchemist:
                               width=width,
                               height=height))
         
-        # Create map for user id
+        # Create tile map
         for x in range(width):
             for y in range(height):
                 tile_uuid = str(uuid4())
@@ -45,33 +46,33 @@ class Alchemist:
                                           tile_uuid=tile_uuid))
 
 
-
     def get_user(self, user_uuid: str) -> User:
-        stmt = select(User).where(User.user_uuid == user_uuid)
-        result = self.session.execute(stmt).scalars()
+        sql = select(User).where(User.user_uuid == user_uuid)
+        result = self.session.execute(sql).scalars()
         return result.one()
-
 
 
     def get_tiles(self,
                 user_uuid: str, 
-                tiles: list[str]
+                tile_uuids: list[str]
                 ) -> list[tuple[Tile, Resource]]:
         '''
         Get a list of tiles from a list of tile uuid addresses.
         '''
         tile_resources: list[tuple[Tile, Resource]] = []
-        for uuid in tiles:
-            stmt = select(Tile).where((Tile.tile_uuid==uuid) &
-                                        (Tile.user_uuid == user_uuid)
-                                        )
-            result = self.session.execute(stmt).scalars()
+        for tile_uuid in tile_uuids:
+            sql = select(Tile).where((Tile.tile_uuid==tile_uuid) &
+                                     (Tile.user_uuid == user_uuid))
+            result = self.session.execute(sql).scalars()
             t = result.one()
 
-            stmt = select(Resource).where(Resource.tile_uuid == uuid)
-            result = self.session.execute(stmt).scalars()
+            sql = select(Resource).where(Resource.tile_uuid == tile_uuid)
+            result = self.session.execute(sql).scalars()
             r = result.one()
 
             tile_resources.append((t, r))
         return tile_resources
+    
+
+    
         

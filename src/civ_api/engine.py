@@ -11,7 +11,7 @@ from .classes import DiplomaticRelations
 from .constants.enums import GamePhases, DiplomaticStatus
 from .entities import Unit, City
 from .functions import get_neighbouring_tiles
-from .type_aliasing import ImmutableType, SQLTableDict
+from .type_aliasing import ImmutableType, BasicDict
 
 
 class UserOrder:
@@ -37,7 +37,7 @@ class DatabaseStrategy():
         self.user_uuid = user_uuid
     
 
-    def update(self, table_name: str, table_dictionary: SQLTableDict) -> None:
+    def update(self, table_name: str, table_dictionary: BasicDict) -> None:
         # self.database_manager...
         ...
     

@@ -9,7 +9,7 @@ from loguru import logger
 from src.civ_api.constants import Resources
 from src.civ_api.functions import vals
 from src.civ_api.type_aliasing import (ImmutableType, 
-                                       SQLTableDict, 
+                                       BasicDict, 
                                        ResourceRanges)
 
 
@@ -95,7 +95,7 @@ def setup_database(database_path: str) -> None:
 
 
 def test_get_random_resources(resource_ranges: ResourceRanges | None = None
-                                ) -> SQLTableDict:
+                                ) -> BasicDict:
     '''
     Get a random assortment of the given resources.
     '''

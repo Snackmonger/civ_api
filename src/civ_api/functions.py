@@ -2,7 +2,7 @@ from random import choice, randint
 from enum import StrEnum
 
 from .constants.resources import resource_minmax
-from .type_aliasing import SQLTableDict, ResourceRanges
+from .type_aliasing import BasicDict, ResourceRanges
 
 
 class Abstraction: pass
@@ -30,14 +30,25 @@ def test_get_random_resources(resource_ranges: ResourceRanges | None = None
     return resources
 
 
+def total_resources(resources: list[BasicDict]) -> dict[str, int]:
+    total: dict[str, int] = {}
+    for resource in resources:
+        for k, v in resource.items():
+            if not isinstance(v, int):
+                continue
+            if k not in total:
+                total.update({k: v})
+            else:
+                total.update({k: total[k] + v})
+    return total
+
 
 def vals(enum: type[StrEnum]) -> list[str]:
     '''Syntactic shortcut to get the values of a string enum.'''
     return [e.value for e in enum]
 
 
-
-def SQL_keyrefs_insert(dictionary: SQLTableDict) -> tuple[str, str]:
+def SQL_keyrefs_insert(dictionary: BasicDict) -> tuple[str, str]:
     '''
     {"key": value, "key2": value} -> ("key1, key2", ":key1, :key2")
     '''
@@ -47,7 +58,7 @@ def SQL_keyrefs_insert(dictionary: SQLTableDict) -> tuple[str, str]:
     return (keys, references)
 
 
-def SQL_keyrefs_dict(dictionary: SQLTableDict) -> dict[str, str]:
+def SQL_keyrefs_dict(dictionary: BasicDict) -> dict[str, str]:
     """
     {"key": value, "key2": value} -> {"key": ":key", "key2": ":key2"}
     """
@@ -57,7 +68,7 @@ def SQL_keyrefs_dict(dictionary: SQLTableDict) -> dict[str, str]:
     return dictionary_
 
 
-def SQL_keyrefs_eq(dictionary: SQLTableDict) -> list[str]:
+def SQL_keyrefs_eq(dictionary: BasicDict) -> list[str]:
     """
     {"key": value, "key2": value} -> ["key = :key", "key2 = :key2"]
     """

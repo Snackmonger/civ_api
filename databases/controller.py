@@ -3,7 +3,7 @@ from loguru import logger
 from typing import Any
 from civ_api.functions import SQL_keyrefs_eq, SQL_keyrefs_insert
 
-from src.civ_api.type_aliasing import SQLTableDict, ImmutableType
+from src.civ_api.type_aliasing import BasicDict, ImmutableType
 
 
 class DatabaseManager:
@@ -23,7 +23,7 @@ class DatabaseManager:
         self.__con.close()
 
     
-    def get_full_table(self, table_name: str) -> list[SQLTableDict]:
+    def get_full_table(self, table_name: str) -> list[BasicDict]:
         cursor = self.__cur.execute(f'SELECT * FROM {table_name} ;')
         columns = [c[0] for c in cursor.description]
         rows = cursor.fetchall()
@@ -33,7 +33,7 @@ class DatabaseManager:
     def get_filtered_table(self, 
                            table_name: str, 
                            dictionary: dict[str, ImmutableType]
-                           ) -> list[SQLTableDict]:
+                           ) -> list[BasicDict]:
         symbols = SQL_keyrefs_eq(dictionary)
         conditions = "AND ".join(symbols)
         cursor = self.__cur.execute(f'SELECT * FROM {table_name} WHERE {conditions};', dictionary)
@@ -43,15 +43,15 @@ class DatabaseManager:
     
 
     @staticmethod
-    def extract_to_dictionaries(columns: list[str], rows: list[Any]) -> list[SQLTableDict]:
-        table_rows: list[SQLTableDict] = []
+    def extract_to_dictionaries(columns: list[str], rows: list[Any]) -> list[BasicDict]:
+        table_rows: list[BasicDict] = []
         for row in rows:
             table_rows.append(dict(zip(columns, row)))
         return table_rows
 
 
 
-    def execute(self, query: str, dictionary: SQLTableDict, operation: str | None = None) -> None:
+    def execute(self, query: str, dictionary: BasicDict, operation: str | None = None) -> None:
         operation = operation or 'UNSPECIFIED'
         try:
             self.__cur.execute(query, dictionary)
@@ -62,13 +62,13 @@ class DatabaseManager:
             raise e
 
 
-    def insert_table_from_dict(self, table_name: str, dictionary: SQLTableDict) -> None:
+    def insert_table_from_dict(self, table_name: str, dictionary: BasicDict) -> None:
         keys, keyrefs = SQL_keyrefs_insert(dictionary)
         query = f'INSERT INTO {table_name}({keys}) VALUES ({keyrefs}); '
         self.execute(query, dictionary, 'INSERT')
 
 
-    def update_table_from_dict(self, table_name: str, primary_key: str, dictionary: SQLTableDict) -> None:
+    def update_table_from_dict(self, table_name: str, primary_key: str, dictionary: BasicDict) -> None:
         primary_value = dictionary[primary_key]
         values = ', '.join([f'{k}=:{k}' for k in dictionary])
         query = f'UPDATE {table_name} SET {values} WHERE {primary_key} = "{primary_value}"; '
@@ -123,7 +123,7 @@ class DatabaseManager:
                 tile_uuid = str(uuid4())
 
                 logger.debug(f'Creating random resource profile for tile {tile_uuid}...')
-                resources: SQLTableDict = test_get_random_resources()
+                resources: BasicDict = test_get_random_resources()
                 assert isinstance(resources, dict)
 
                
